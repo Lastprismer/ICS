@@ -313,9 +313,11 @@ while (test-expr)
 
 和使用一组很长的`if-else`语句相比，使用跳转表的优点是执行开关语句的时间与开关情况的数量无关。 
 
-开关情况较多、值的跨度范围较时，使用跳转表
+开关情况较多、值的跨度范围较小时，使用跳转表
 
-例：C
+gcc会根据 **开关情况的数量** 和 **开关情况值的稀疏程度** 来翻译开关语句。开关情况数量比较多（例如4个以上），并且值的范围跨度比较小时，就会使用跳转表。
+
+例：
 
 ```c
 void switch_eg (long x, long n, long *dest)
@@ -385,60 +387,55 @@ void switch_eg_impl (long x, long n, long *dest)
 ```
 
 ```assembly
-# O2优化生成源代码
-# test.c:6:     switch (n)
-	subq	$100, %rsi	#, tmp90
-	cmpq	$6, %rsi	#, tmp90
-	ja	.L2	#,
-	leaq	.L4(%rip), %rcx	#, tmp91
-	movslq	(%rcx,%rsi,4), %rax	#, tmp93
-	addq	%rcx, %rax	# tmp91, tmp94
-	jmp	*%rax	# tmp94
+.LFB23:
+	.cfi_startproc
+	subq	$100, %rsi
+	cmpq	$6, %rsi
+	ja	.L8			# n>6，进入loc_def（负数变为大整数，也>6）
+	leaq	.L4(%rip), %rcx
+	movslq	(%rcx,%rsi,4), %rax
+	addq	%rcx, %rax
+	jmp	*%rax
 	.section	.rodata # 只读数据，Read-Only Data，存放若干qword（x86-64的long）
 	# jmp	*.L4(,%rsi,8) 为课本上给出的示例跳转
-	.align 4
+	.align 4	# 将地址对齐到4的倍数
 	.align 4
 .L4:
-	.long	.L3-.L4	# case 100: loc_A 后面依次同理
-	.long	.L2-.L4
-	.long	.L5-.L4
-	.long	.L6-.L4
-	.long	.L7-.L4
-	.long	.L2-.L4
-	.long	.L7-.L4
+	.long	.L3-.L4	# case 100: loc_A
+	.long	.L8-.L4	# case 101: loc_def，范围内缺失的情况：默认情况
+	.long	.L5-.L4	# case 102: loc_B
+	.long	.L6-.L4	# case 103: loc_C
+	.long	.L7-.L4	# case 104: loc_D
+	.long	.L8-.L4	# case 105: loc_def
+	.long	.L7-.L4	# case 106: loc_D
 	.text
 	.p2align 4,,10
 	.p2align 3
-.L3:
-# test.c:9:             val *= 114514;
-	imulq	$114514, %rdi, %rdi	#, x, x
-.L2:
-# test.c:22:     *dest = val;
-	movq	%rdi, (%rdx)	# x, *dest_10(D)
-# test.c:23: }
+.L5:                             # case 102
+	addq	$1919810, %rdi      # 没有写break，继续运行下去
+.L6:                             # case 103
+	addq	$114, %rdi
+	movq	%rdi, (%rdx)
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L5:
-# test.c:12:             val += 1919810;
-	addq	$1919810, %rdi	#, x
-	# 没写break，继续运行下去
-.L6:
-# test.c:15:             val += 114;
-	addq	$114, %rdi	#, x
-# test.c:22:     *dest = val;
-	movq	%rdi, (%rdx)	# x, *dest_10(D)
-# test.c:23: }
+.L3:                             # case 100
+	imulq	$114514, %rdi, %rdi
+	movq	%rdi, (%rdx)
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L7:
-# test.c:19:             val *= val;
-	imulq	%rdi, %rdi	# x, x
-# test.c:22:     *dest = val;
-	movq	%rdi, (%rdx)	# x, *dest_10(D)
-# test.c:23: }
+.L7:  		                    # case 104, 106，某种情况对应多种标号（跳转表中相应数组元素相同）
+	imulq	%rdi, %rdi
+	movq	%rdi, (%rdx)
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L8:                             # default
+	xorl	%edi, %edi
+	movq	%rdi, (%rdx)
 	ret
 	.cfi_endproc
 ```
 
+此例中，程序可以只用一次跳转表引用就分支到5个不同的位置。
