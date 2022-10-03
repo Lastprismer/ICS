@@ -24,20 +24,19 @@
 * **SF**：符号标志：最近操作得到的结果为负数
 
 * **OF**：溢出标志：最近操作导致一个补码溢出（正/负）
-
-  * 都只有一个位
-
+  * 都**只有一个位**，表述的是**最近**的算数或逻辑运算的结果
+  
   * `leaq`不会改变任何条件码
   * 逻辑操作中，CF和OF会被设置为0
   * 移位操作中，CF会被设置为最后一个被移出的位，OF设置为0
-  * INC和DEC指令会设置OF和ZF，但是不会改变CF
+  * INC（++）和DEC（--）指令会设置OF和ZF，但是不会改变CF
 
-例：t, a, b为整型，用ADD指令完成t=a+b：
+例：t, a, b为整型，用ADD指令完成`t = a + b`：
 
 * CF：`(unsigned)t < (unsigned)a`
 * ZF：`t == 0`
-* SF：t < 0
-* OF：(a < 0 && b < 0) &&  (a < 0 != t < 0)
+* SF：`t < 0`
+* OF：`(a < 0 && b < 0) && (a < 0 != t < 0)`
 
 
 
@@ -81,6 +80,8 @@ setq	%al
 movzbl	%al, %eax
 ret
 ```
+
+例：`setg	D`：不为0，为负但是溢出（大整数） / 不溢出且为正
 
 
 
@@ -181,6 +182,8 @@ long cmovdiff (long x, long y)
 
 与条件跳转不同，处理器无需预测测试的结果就可以执行条件传送。处理器只是读源值（可能是从内存中），检查条件码，然后要么更新目的寄存器，要么保持不变。
 
+**不能传送单字节**，单字，双字，四字都可。
+
 
 
 #### 条件数据传送的问题
@@ -220,9 +223,13 @@ long cread (long *xp)
 
 编译器会在一定程度上避免这种错误，但不能完全避免
 
+不是总可以提高代码的执行效率
+
 
 
 ## Loops 流控制：循环
+
+条件测试 + 跳转组合 = 循环
 
 ### 一、do-while 循环
 
@@ -261,15 +268,17 @@ to
    test:
    t = test-expr;
    if (t) goto loop;
+   // 缺点：无论有没有符合条件，都会跳转
    ```
-
+   
 2. ```c
-   // 转化成do-while
+   // 转化成do-while guarded-do
    t = test-expr;
    if (!t)
        goto done;
    do
        body-statement
+   // 可能快一点（开局不直接跳转）
    ```
 
 
@@ -292,7 +301,7 @@ while (test-expr)
 }
 ```
 
-
+`continue`：跳转到`update-expr`
 
 
 
@@ -303,6 +312,8 @@ while (test-expr)
 **跳转表**是一个数组， 表项 $i$ 是一个代码段的地址，这个代码段实现当开关索引值等于 $i$ 时程序应该采取的动作。
 
 和使用一组很长的`if-else`语句相比，使用跳转表的优点是执行开关语句的时间与开关情况的数量无关。 
+
+开关情况较多、值的跨度范围较时，使用跳转表
 
 例：C
 
@@ -337,8 +348,8 @@ void switch_eg_impl (long x, long n, long *dest)
     static void *jt[7] = 
     {
         &&loc_A, &&loc_def, &&loc_B, &&loc_C, &&loc_D, &&loc_def, &&loc_D
-    };
-    unsigned long index = n - 100;
+    }; // 指向代码位置的指针
+    unsigned long index = n - 100; // 无符号
     long val;
     if (index > 6)
         goto loc_def;
@@ -376,7 +387,7 @@ void switch_eg_impl (long x, long n, long *dest)
 	movslq	(%rcx,%rsi,4), %rax	#, tmp93
 	addq	%rcx, %rax	# tmp91, tmp94
 	jmp	*%rax	# tmp94
-	.section	.rodata
+	.section	.rodata # ，
 	.align 4
 	.align 4
 .L4:
