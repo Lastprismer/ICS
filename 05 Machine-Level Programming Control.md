@@ -139,7 +139,7 @@ done:
 
 ### 三、用条件传送实现条件分支
 
-用控制实现条件转移简单而通用，但是在现代处理器上，它可能会非常低效。替代的策略是使用**数据**的条件转移：**先计算出条件操作的两种结果，然后再根据条件是否满足从中选取一个**。
+用控制实现条件转移简单而通用，但是在现代处理器上，它 **可能** 会非常低效。替代的策略是使用**数据**的条件转移：**先计算出条件操作的两种结果，然后再根据条件是否满足从中选取一个**。
 
 ```c
 long absdiff (long x, long y)
@@ -168,7 +168,7 @@ long cmovdiff (long x, long y)
 }
 ```
 
-性能更高原因：重叠连续指令来获得高性能，程序会预测要跳转到哪个分支以提前重叠连续指令；预测错误会多花时间运行本不用运行的指令
+性能更高原因：**流水线**（pipelining）中，每一条指令的处理会经过一系列的阶段，每个阶段执行所需操作的一小部分（从内存中取指令、确定指令类型、从内存读数据、执行算术运算、向内存写数据、更新程序计数器）；处理器通过重叠连续指令的步骤来获得高性能，程序会预测要跳转到哪个分支以提前重叠连续指令（**分支预测逻辑**）；预测错误会招致惩罚：多花时间运行本不用运行的指令、丢掉它为这条跳转指令后所有已用指令所做的工作、从正确位置处开始填充流水线
 
 预测错误概率为 $p$，没有预测错误执行时间是 $T_{OK}$，预测错误处罚是 $T_{MP}$。
 
@@ -223,7 +223,7 @@ long cread (long *xp)
 
 编译器会在一定程度上避免这种错误，但不能完全避免
 
-不是总可以提高代码的执行效率
+**条件数据传送不是总可以提高代码的执行效率**
 
 
 
@@ -336,6 +336,8 @@ void switch_eg (long x, long n, long *dest)
         case 106:
             val *= val;
             break;
+        default:
+            val = 0;
     }
     *dest = val;
 }
@@ -350,6 +352,10 @@ void switch_eg_impl (long x, long n, long *dest)
         &&loc_A, &&loc_def, &&loc_B, &&loc_C, &&loc_D, &&loc_def, &&loc_D
     }; // 指向代码位置的指针
     unsigned long index = n - 100; // 无符号
+    /* 此处例：
+    编译器：将n减去100后，取值范围移到0-6之间
+    补码表示的负数变为无符号大整数，进一步简化分支
+    */
     long val;
     if (index > 6)
         goto loc_def;
@@ -379,6 +385,7 @@ void switch_eg_impl (long x, long n, long *dest)
 ```
 
 ```assembly
+# O2优化生成源代码
 # test.c:6:     switch (n)
 	subq	$100, %rsi	#, tmp90
 	cmpq	$6, %rsi	#, tmp90
@@ -387,11 +394,12 @@ void switch_eg_impl (long x, long n, long *dest)
 	movslq	(%rcx,%rsi,4), %rax	#, tmp93
 	addq	%rcx, %rax	# tmp91, tmp94
 	jmp	*%rax	# tmp94
-	.section	.rodata # ，
+	.section	.rodata # 只读数据，Read-Only Data，存放若干qword（x86-64的long）
+	# jmp	*.L4(,%rsi,8) 为课本上给出的示例跳转
 	.align 4
 	.align 4
 .L4:
-	.long	.L3-.L4
+	.long	.L3-.L4	# case 100: loc_A 后面依次同理
 	.long	.L2-.L4
 	.long	.L5-.L4
 	.long	.L6-.L4
@@ -414,6 +422,7 @@ void switch_eg_impl (long x, long n, long *dest)
 .L5:
 # test.c:12:             val += 1919810;
 	addq	$1919810, %rdi	#, x
+	# 没写break，继续运行下去
 .L6:
 # test.c:15:             val += 114;
 	addq	$114, %rdi	#, x
