@@ -2265,32 +2265,34 @@ Disassembly of section .text:
     164e:	e8 cd fb ff ff       	callq  1220 <free@plt>
     1653:	e9 c5 fe ff ff       	jmpq   151d <main+0x54>
 
-0000000000001658 <abracadabra>:
+0000000000001658 <abracadabra>:                             # 返回值不应该为0
     1658:	f3 0f 1e fa          	endbr64 
     165c:	48 81 ec a8 00 00 00 	sub    $0xa8,%rsp
     1663:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
     166a:	00 00 
     166c:	48 89 84 24 98 00 00 	mov    %rax,0x98(%rsp)
     1673:	00 
-    1674:	31 c0                	xor    %eax,%eax
-    1676:	48 8d 4c 24 0c       	lea    0xc(%rsp),%rcx
-    167b:	48 8d 54 24 08       	lea    0x8(%rsp),%rdx
-    1680:	48 83 ec 08          	sub    $0x8,%rsp
-    1684:	48 8d 44 24 28       	lea    0x28(%rsp),%rax
-    1689:	50                   	push   %rax
+    1674:	31 c0                	xor    %eax,%eax        # %rax = 0
+    1676:	48 8d 4c 24 0c       	lea    0xc(%rsp),%rcx   # %rcx = 12 + %rsp
+    167b:	48 8d 54 24 08       	lea    0x8(%rsp),%rdx   # %rdx = 8 + %rsp
+    1680:	48 83 ec 08          	sub    $0x8,%rsp        # 再开一字节空间
+    1684:	48 8d 44 24 28       	lea    0x28(%rsp),%rax  # %rax = 40 + %rsp
+    1689:	50                   	push   %rax             
     168a:	48 8d 44 24 2c       	lea    0x2c(%rsp),%rax
     168f:	50                   	push   %rax
     1690:	48 8d 44 24 30       	lea    0x30(%rsp),%rax
     1695:	50                   	push   %rax
     1696:	4c 8d 4c 24 34       	lea    0x34(%rsp),%r9
     169b:	4c 8d 44 24 30       	lea    0x30(%rsp),%r8
-    16a0:	48 8d 35 f5 2a 00 00 	lea    0x2af5(%rip),%rsi        # 419c <_IO_stdin_used+0x19c>
-    16a7:	48 8d 3d 6a 6e 00 00 	lea    0x6e6a(%rip),%rdi        # 8518 <input_strings+0x78>
+    16a0:	48 8d 35 f5 2a 00 00 	lea    0x2af5(%rip),%rsi        # "%d %d %d %d %d %d %s"
+    16a7:	48 8d 3d 6a 6e 00 00 	lea    0x6e6a(%rip),%rdi        # 输入的 0 1 1 2 3 5
+                                                                    # 要在第二题动手脚
     16ae:	b8 00 00 00 00       	mov    $0x0,%eax
     16b3:	e8 78 fc ff ff       	callq  1330 <__isoc99_sscanf@plt>
     16b8:	48 83 c4 20          	add    $0x20,%rsp
-    16bc:	83 f8 07             	cmp    $0x7,%eax
+    16bc:	83 f8 07             	cmp    $0x7,%eax                # 第二题输入七个
     16bf:	74 20                	je     16e1 <abracadabra+0x89>
+
     16c1:	b8 00 00 00 00       	mov    $0x0,%eax
     16c6:	48 8b b4 24 98 00 00 	mov    0x98(%rsp),%rsi
     16cd:	00 
@@ -2299,14 +2301,17 @@ Disassembly of section .text:
     16d7:	75 2b                	jne    1704 <abracadabra+0xac>
     16d9:	48 81 c4 a8 00 00 00 	add    $0xa8,%rsp
     16e0:	c3                   	retq   
-    16e1:	48 8d 7c 24 20       	lea    0x20(%rsp),%rdi
-    16e6:	48 8d 35 db 2a 00 00 	lea    0x2adb(%rip),%rsi        # 41c8 <_IO_stdin_used+0x1c8>
+
+    16e1:	48 8d 7c 24 20       	lea    0x20(%rsp),%rdi          # 继续走
+    16e6:	48 8d 35 db 2a 00 00 	lea    0x2adb(%rip),%rsi        # NothingThatHasMeaning1sEasy...
     16ed:	e8 83 06 00 00       	callq  1d75 <strings_not_equal>
     16f2:	85 c0                	test   %eax,%eax
-    16f4:	74 07                	je     16fd <abracadabra+0xa5>
+    16f4:	74 07                	je     16fd <abracadabra+0xa5>  # 字符串相同
+
     16f6:	b8 00 00 00 00       	mov    $0x0,%eax
     16fb:	eb c9                	jmp    16c6 <abracadabra+0x6e>
-    16fd:	b8 01 00 00 00       	mov    $0x1,%eax
+
+    16fd:	b8 01 00 00 00       	mov    $0x1,%eax                # 则返回1
     1702:	eb c2                	jmp    16c6 <abracadabra+0x6e>
     1704:	e8 77 fb ff ff       	callq  1280 <__stack_chk_fail@plt>
 
@@ -2321,10 +2326,10 @@ Disassembly of section .text:
     1727:	48 8d 4c 24 0c       	lea    0xc(%rsp),%rcx
     172c:	48 8d 54 24 08       	lea    0x8(%rsp),%rdx
     1731:	4c 8d 44 24 10       	lea    0x10(%rsp),%r8
-    1736:	48 8d 35 6b 2a 00 00 	lea    0x2a6b(%rip),%rsi        # 41a8 <_IO_stdin_used+0x1a8>
-    173d:	48 8d 3d c4 6e 00 00 	lea    0x6ec4(%rip),%rdi        # 8608 <input_strings+0x168>
+    1736:	48 8d 35 6b 2a 00 00 	lea    0x2a6b(%rip),%rsi        # %d %d %s
+    173d:	48 8d 3d c4 6e 00 00 	lea    0x6ec4(%rip),%rdi        # 4 8，第四题的输入
     1744:	e8 e7 fb ff ff       	callq  1330 <__isoc99_sscanf@plt>
-    1749:	83 f8 03             	cmp    $0x3,%eax
+    1749:	83 f8 03             	cmp    $0x3,%eax                # 输入内容不为3个，直接走
     174c:	74 20                	je     176e <alohomora+0x65>
     174e:	b8 00 00 00 00       	mov    $0x0,%eax
     1753:	48 8b b4 24 88 00 00 	mov    0x88(%rsp),%rsi
@@ -2334,18 +2339,20 @@ Disassembly of section .text:
     1764:	75 42                	jne    17a8 <alohomora+0x9f>
     1766:	48 81 c4 98 00 00 00 	add    $0x98,%rsp
     176d:	c3                   	retq   
-    176e:	48 8d 54 24 10       	lea    0x10(%rsp),%rdx
-    1773:	0f b6 02             	movzbl (%rdx),%eax
-    1776:	84 c0                	test   %al,%al
-    1778:	74 0b                	je     1785 <alohomora+0x7c>
-    177a:	83 c0 02             	add    $0x2,%eax
-    177d:	88 02                	mov    %al,(%rdx)
-    177f:	48 83 c2 01          	add    $0x1,%rdx
-    1783:	eb ee                	jmp    1773 <alohomora+0x6a>
-    1785:	48 8d 7c 24 10       	lea    0x10(%rsp),%rdi
-    178a:	48 8d 35 57 2a 00 00 	lea    0x2a57(%rip),%rsi        # 41e8 <_IO_stdin_used+0x1e8>
-    1791:	e8 df 05 00 00       	callq  1d75 <strings_not_equal>
-    1796:	85 c0                	test   %eax,%eax
+
+    176e:	48 8d 54 24 10       	lea    0x10(%rsp),%rdx          # %rdx = 10+%rsp
+
+    1773:	0f b6 02             	movzbl (%rdx),%eax              # k = M[%rdx] % 128
+    1776:	84 c0                	test   %al,%al                  # if (k % 128 == 0)
+    1778:	74 0b                	je     1785 <alohomora+0x7c>    # break;
+    177a:	83 c0 02             	add    $0x2,%eax                # k += 2
+    177d:	88 02                	mov    %al,(%rdx)               # M[%rdx] = k % 128
+    177f:	48 83 c2 01          	add    $0x1,%rdx                # %rdx++;
+    1783:	eb ee                	jmp    1773 <alohomora+0x6a>    # continue
+    1785:	48 8d 7c 24 10       	lea    0x10(%rsp),%rdi          # %rdi = 16+%rsp
+    178a:	48 8d 35 57 2a 00 00 	lea    0x2a57(%rip),%rsi        # 000Gcu{FqgupvGpvgt3pvqItqypWrNkhg0，每一个字符都+2
+    1791:	e8 df 05 00 00       	callq  1d75 <strings_not_equal> # 不同
+    1796:	85 c0                	test   %eax,%eax                # ...EasyDoesntEnter1ntoGrownUpLife.
     1798:	74 07                	je     17a1 <alohomora+0x98>
     179a:	b8 00 00 00 00       	mov    $0x0,%eax
     179f:	eb b2                	jmp    1753 <alohomora+0x4a>
@@ -2754,32 +2761,34 @@ Disassembly of section .text:
     1b65:	c3                   	retq   
     1b66:	e8 15 f7 ff ff       	callq  1280 <__stack_chk_fail@plt>
 
-0000000000001b6b <emulate_fsm>:
+0000000000001b6b <emulate_fsm>:                                     # %rdi = 0, %rsi = 输入字符串的地址
     1b6b:	f3 0f 1e fa          	endbr64 
     1b6f:	55                   	push   %rbp
     1b70:	53                   	push   %rbx
     1b71:	48 83 ec 08          	sub    $0x8,%rsp
-    1b75:	89 fd                	mov    %edi,%ebp
-    1b77:	48 89 f3             	mov    %rsi,%rbx
+    1b75:	89 fd                	mov    %edi,%ebp                # i = 0
+    1b77:	48 89 f3             	mov    %rsi,%rbx                # %rbx = s[0]
     1b7a:	eb 27                	jmp    1ba3 <emulate_fsm+0x38>
+
     1b7c:	0f be 03             	movsbl (%rbx),%eax
     1b7f:	83 e8 30             	sub    $0x30,%eax
-    1b82:	48 63 ed             	movslq %ebp,%rbp
-    1b85:	48 98                	cltq   
+    1b82:	48 63 ed             	movslq %ebp,%rbp                # %rax = s[i]
+    1b85:	48 98                	cltq
     1b87:	48 8d 3c c5 00 00 00 	lea    0x0(,%rax,8),%rdi
     1b8e:	00 
     1b8f:	48 29 c7             	sub    %rax,%rdi
-    1b92:	48 01 ef             	add    %rbp,%rdi
-    1b95:	48 8d 05 44 28 00 00 	lea    0x2844(%rip),%rax        # 43e0 <transition_table>
-    1b9c:	8b 2c b8             	mov    (%rax,%rdi,4),%ebp
-    1b9f:	48 83 c3 01          	add    $0x1,%rbx
-    1ba3:	0f b6 03             	movzbl (%rbx),%eax
-    1ba6:	84 c0                	test   %al,%al
-    1ba8:	74 0e                	je     1bb8 <emulate_fsm+0x4d>
-    1baa:	83 e8 30             	sub    $0x30,%eax
-    1bad:	3c 01                	cmp    $0x1,%al
-    1baf:	76 cb                	jbe    1b7c <emulate_fsm+0x11>
-    1bb1:	e8 96 05 00 00       	callq  214c <explode_bomb>
+    1b92:	48 01 ef             	add    %rbp,%rdi                # %rdi = 7 * %rax + i
+    1b95:	48 8d 05 44 28 00 00 	lea    0x2844(%rip),%rax        # 6, 1, 5, 4, 0, 3, 2, 0, 4, 2, 1, 1, 5, 6 跳转表table[14]
+    1b9c:	8b 2c b8             	mov    (%rax,%rdi,4),%ebp       # %rbp = table[%rdi]
+    1b9f:	48 83 c3 01          	add    $0x1,%rbx                # i++
+
+    1ba3:	0f b6 03             	movzbl (%rbx),%eax              # %rax = s[i]
+    1ba6:	84 c0                	test   %al,%al                  # if (%rax == 0，字符串结尾)
+    1ba8:	74 0e                	je     1bb8 <emulate_fsm+0x4d>  # return %rbp
+    1baa:	83 e8 30             	sub    $0x30,%eax               # %rax -= 48;
+    1bad:	3c 01                	cmp    $0x1,%al                 # if ((%rax % 128) <= 1)
+    1baf:	76 cb                	jbe    1b7c <emulate_fsm+0x11>  # 回去
+    1bb1:	e8 96 05 00 00       	callq  214c <explode_bomb>      # > 1，爆炸，输入只能是1或0
     1bb6:	eb c4                	jmp    1b7c <emulate_fsm+0x11>
     1bb8:	89 e8                	mov    %ebp,%eax
     1bba:	48 83 c4 08          	add    $0x8,%rsp
@@ -2787,7 +2796,7 @@ Disassembly of section .text:
     1bbf:	5d                   	pop    %rbp
     1bc0:	c3                   	retq   
 
-0000000000001bc1 <check_synchronizing_sequence>:
+0000000000001bc1 <check_synchronizing_sequence>:                # 字符串存在%rbp里，%rdi=%rbp
     1bc1:	f3 0f 1e fa          	endbr64 
     1bc5:	41 54                	push   %r12
     1bc7:	55                   	push   %rbp
@@ -2819,38 +2828,38 @@ Disassembly of section .text:
     1c0b:	f3 0f 1e fa          	endbr64 
     1c0f:	55                   	push   %rbp
     1c10:	53                   	push   %rbx
-    1c11:	48 83 ec 18          	sub    $0x18,%rsp
+    1c11:	48 83 ec 18          	sub    $0x18,%rsp               # 开24字节空间
     1c15:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
     1c1c:	00 00 
-    1c1e:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
-    1c23:	31 c0                	xor    %eax,%eax
-    1c25:	e8 55 06 00 00       	callq  227f <read_line>
-    1c2a:	48 89 c5             	mov    %rax,%rbp
-    1c2d:	bb 00 00 00 00       	mov    $0x0,%ebx
+    1c1e:	48 89 44 24 08       	mov    %rax,0x8(%rsp)           # 2 字节的金丝雀
+    1c23:	31 c0                	xor    %eax,%eax                # %rax置为0
+    1c25:	e8 55 06 00 00       	callq  227f <read_line>         # 输入一行
+    1c2a:	48 89 c5             	mov    %rax,%rbp                # 写入的行在%rbp里
+    1c2d:	bb 00 00 00 00       	mov    $0x0,%ebx                # %rbx = 0
     1c32:	eb 08                	jmp    1c3c <secret_phase+0x31>
     1c34:	e8 13 05 00 00       	callq  214c <explode_bomb>
-    1c39:	83 c3 01             	add    $0x1,%ebx
-    1c3c:	48 63 c3             	movslq %ebx,%rax
+    1c39:	83 c3 01             	add    $0x1,%ebx                # ++%rbx
+    1c3c:	48 63 c3             	movslq %ebx,%rax                # if (M[%rbp+%rbx] == 0)
     1c3f:	80 7c 05 00 00       	cmpb   $0x0,0x0(%rbp,%rax,1)
-    1c44:	74 07                	je     1c4d <secret_phase+0x42>
-    1c46:	83 fb 18             	cmp    $0x18,%ebx
-    1c49:	7e ee                	jle    1c39 <secret_phase+0x2e>
-    1c4b:	eb e7                	jmp    1c34 <secret_phase+0x29>
+    1c44:	74 07                	je     1c4d <secret_phase+0x42> # 过了，跳出
+    1c46:	83 fb 18             	cmp    $0x18,%ebx               # 否则 if (%rbx > 24)
+    1c49:	7e ee                	jle    1c39 <secret_phase+0x2e> # 跳一步
+    1c4b:	eb e7                	jmp    1c34 <secret_phase+0x29> # 否则炸
     1c4d:	48 89 ef             	mov    %rbp,%rdi
     1c50:	e8 6c ff ff ff       	callq  1bc1 <check_synchronizing_sequence>
-    1c55:	85 c0                	test   %eax,%eax
-    1c57:	75 69                	jne    1cc2 <secret_phase+0xb7>
-    1c59:	48 8d 3d 10 26 00 00 	lea    0x2610(%rip),%rdi        # 4270 <_IO_stdin_used+0x270>
+    1c55:	85 c0                	test   %eax,%eax                # if (%eax != 0)
+    1c57:	75 69                	jne    1cc2 <secret_phase+0xb7> # 爆炸
+    1c59:	48 8d 3d 10 26 00 00 	lea    0x2610(%rip),%rdi        # Unbelievable! You've defused the secret stage! Jesus!
     1c60:	e8 fb f5 ff ff       	callq  1260 <puts@plt>
-    1c65:	48 8d 3d 3c 26 00 00 	lea    0x263c(%rip),%rdi        # 42a8 <_IO_stdin_used+0x2a8>
+    1c65:	48 8d 3d 3c 26 00 00 	lea    0x263c(%rip),%rdi        # Dr. Evil sends you an invitation to join his nefarious party.
     1c6c:	e8 ef f5 ff ff       	callq  1260 <puts@plt>
-    1c71:	48 8d 3d 70 26 00 00 	lea    0x2670(%rip),%rdi        # 42e8 <_IO_stdin_used+0x2e8>
+    1c71:	48 8d 3d 70 26 00 00 	lea    0x2670(%rip),%rdi        # He offered you cutting-edge labs with money to burn.
     1c78:	e8 e3 f5 ff ff       	callq  1260 <puts@plt>
-    1c7d:	48 8d 3d 9c 26 00 00 	lea    0x269c(%rip),%rdi        # 4320 <_IO_stdin_used+0x320>
+    1c7d:	48 8d 3d 9c 26 00 00 	lea    0x269c(%rip),%rdi        # Bloody hell! You know it is probably your last chance in life
     1c84:	e8 d7 f5 ff ff       	callq  1260 <puts@plt>
-    1c89:	48 8d 3d d0 26 00 00 	lea    0x26d0(%rip),%rdi        # 4360 <_IO_stdin_used+0x360>
+    1c89:	48 8d 3d d0 26 00 00 	lea    0x26d0(%rip),%rdi        # to obtain all that you want...
     1c90:	e8 cb f5 ff ff       	callq  1260 <puts@plt>
-    1c95:	48 8d 3d 15 25 00 00 	lea    0x2515(%rip),%rdi        # 41b1 <_IO_stdin_used+0x1b1>
+    1c95:	48 8d 3d 15 25 00 00 	lea    0x2515(%rip),%rdi        # So, will you take it?
     1c9c:	e8 bf f5 ff ff       	callq  1260 <puts@plt>
     1ca1:	48 8d 7c 24 04       	lea    0x4(%rsp),%rdi
     1ca6:	e8 1f 07 00 00       	callq  23ca <phase_defused>
@@ -3333,9 +3342,11 @@ Disassembly of section .text:
     237b:	e8 f0 ef ff ff       	callq  1370 <exit@plt>
     2380:	48 8d 3d c0 23 00 00 	lea    0x23c0(%rip),%rdi        # 4747 <transition_table+0x367>
     2387:	e8 d4 ee ff ff       	callq  1260 <puts@plt>
-    238c:	8b 05 fa 60 00 00    	mov    0x60fa(%rip),%eax        # 848c <num_input_strings>
+
+    238c:	8b 05 fa 60 00 00    	mov    0x60fa(%rip),%eax
     2392:	8d 50 01             	lea    0x1(%rax),%edx
-    2395:	89 15 f1 60 00 00    	mov    %edx,0x60f1(%rip)        # 848c <num_input_strings>
+    2395:	89 15 f1 60 00 00    	mov    %edx,0x60f1(%rip)        # num_input_strings++
+
     239b:	48 98                	cltq   
     239d:	48 6b c0 78          	imul   $0x78,%rax,%rax
     23a1:	48 8d 15 f8 60 00 00 	lea    0x60f8(%rip),%rdx        # 84a0 <input_strings>
@@ -3366,7 +3377,7 @@ Disassembly of section .text:
     23fa:	89 c5                	mov    %eax,%ebp
     23fc:	89 c3                	mov    %eax,%ebx
     23fe:	eb 19                	jmp    2419 <phase_defused+0x4f>
-    2400:	48 8d 3d e1 20 00 00 	lea    0x20e1(%rip),%rdi        # 44e8 <transition_table+0x108>
+    2400:	48 8d 3d e1 20 00 00 	lea    0x20e1(%rip),%rdi        # Error: Running on an illegal host
     2407:	e8 54 ee ff ff       	callq  1260 <puts@plt>
     240c:	bf 08 00 00 00       	mov    $0x8,%edi
     2411:	e8 5a ef ff ff       	callq  1370 <exit@plt>
@@ -3387,14 +3398,15 @@ Disassembly of section .text:
     2448:	bf 01 00 00 00       	mov    $0x1,%edi
     244d:	e8 1c fb ff ff       	callq  1f6e <send_msg>
     2452:	48 63 db             	movslq %ebx,%rbx
-    2455:	48 8d 05 64 23 00 00 	lea    0x2364(%rip),%rax        # 47c0 <secret_tokens>
+    2455:	48 8d 05 64 23 00 00 	lea    0x2364(%rip),%rax        # 47c0 <secret_tokens> 0x2022fa11
     245c:	8b 04 98             	mov    (%rax,%rbx,4),%eax
-    245f:	41 39 04 24          	cmp    %eax,(%r12)
+    245f:	41 39 04 24          	cmp    %eax,(%r12)              # (%r12): Prog
     2463:	75 2a                	jne    248f <phase_defused+0xc5>
-    2465:	85 ed                	test   %ebp,%ebp
+    2465:	85 ed                	test   %ebp,%ebp                # %rbp != 0
     2467:	74 26                	je     248f <phase_defused+0xc5>
     2469:	83 3d 1c 60 00 00 06 	cmpl   $0x6,0x601c(%rip)        # 848c <num_input_strings>
-    2470:	74 3d                	je     24af <phase_defused+0xe5>
+    2470:	74 3d                	je     24af <phase_defused+0xe5>    # 入口
+
     2472:	48 8b 44 24 48       	mov    0x48(%rsp),%rax
     2477:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
     247e:	00 00 
@@ -3404,31 +3416,39 @@ Disassembly of section .text:
     248b:	5d                   	pop    %rbp
     248c:	41 5c                	pop    %r12
     248e:	c3                   	retq   
-    248f:	48 8d 35 7a 20 00 00 	lea    0x207a(%rip),%rsi        # 4510 <transition_table+0x130>
+
+    248f:	48 8d 35 7a 20 00 00 	lea    0x207a(%rip),%rsi        # Don't try to make the bomb not explode on your local machine!(*/w\357\274\274*)
     2496:	bf 01 00 00 00       	mov    $0x1,%edi
     249b:	b8 00 00 00 00       	mov    $0x0,%eax
     24a0:	e8 9b ee ff ff       	callq  1340 <__printf_chk@plt>
     24a5:	bf 08 00 00 00       	mov    $0x8,%edi
     24aa:	e8 c1 ee ff ff       	callq  1370 <exit@plt>
-    24af:	e8 a4 f1 ff ff       	callq  1658 <abracadabra>
-    24b4:	85 c0                	test   %eax,%eax
-    24b6:	75 1a                	jne    24d2 <phase_defused+0x108>
-    24b8:	48 8d 3d 61 21 00 00 	lea    0x2161(%rip),%rdi        # 4620 <transition_table+0x240>
+    24af:	e8 a4 f1 ff ff       	callq  1658 <abracadabra>           # 阿瓦达索命
+    24b4:	85 c0                	test   %eax,%eax                    # %rax != 0
+    24b6:	75 1a                	jne    24d2 <phase_defused+0x108>   # 入口
+
+    24b8:	48 8d 3d 61 21 00 00 	lea    0x2161(%rip),%rdi        # Congratulations! You've defused the bomb!
     24bf:	e8 9c ed ff ff       	callq  1260 <puts@plt>
-    24c4:	48 8d 3d 85 21 00 00 	lea    0x2185(%rip),%rdi        # 4650 <transition_table+0x270>
+    24c4:	48 8d 3d 85 21 00 00 	lea    0x2185(%rip),%rdi        # Your instructor has been notified and will verify your solution.
     24cb:	e8 90 ed ff ff       	callq  1260 <puts@plt>
     24d0:	eb a0                	jmp    2472 <phase_defused+0xa8>
-    24d2:	e8 32 f2 ff ff       	callq  1709 <alohomora>
-    24d7:	85 c0                	test   %eax,%eax
-    24d9:	74 24                	je     24ff <phase_defused+0x135>
-    24db:	48 8d 3d 9e 20 00 00 	lea    0x209e(%rip),%rdi        # 4580 <transition_table+0x1a0>
+
+    24d2:	e8 32 f2 ff ff       	callq  1709 <alohomora>         # 阿拉霍洞开
+    24d7:	85 c0                	test   %eax,%eax                # 返回不为0
+    24d9:	74 24                	je     24ff <phase_defused+0x135>   # 触发失败
+    24db:	48 8d 3d 9e 20 00 00 	lea    0x209e(%rip),%rdi        # Curses, you've found the secret phase!
     24e2:	e8 79 ed ff ff       	callq  1260 <puts@plt>
-    24e7:	48 8d 3d ba 20 00 00 	lea    0x20ba(%rip),%rdi        # 45a8 <transition_table+0x1c8>
+    24e7:	48 8d 3d ba 20 00 00 	lea    0x20ba(%rip),%rdi        # But finding it and solving it are quite different...
     24ee:	e8 6d ed ff ff       	callq  1260 <puts@plt>
     24f3:	b8 00 00 00 00       	mov    $0x0,%eax
     24f8:	e8 0e f7 ff ff       	callq  1c0b <secret_phase>
     24fd:	eb b9                	jmp    24b8 <phase_defused+0xee>
-    24ff:	48 8d 3d da 20 00 00 	lea    0x20da(%rip),%rdi        # 45e0 <transition_table+0x200>
+
+    # 阿瓦达索命和阿拉霍洞开，两个都解了才行
+    # 看对应函数去
+
+    # 触发失败
+    24ff:	48 8d 3d da 20 00 00 	lea    0x20da(%rip),%rdi        # Do you think you really trigger the secret phase? Mua ha ha ha!
     2506:	e8 55 ed ff ff       	callq  1260 <puts@plt>
     250b:	eb ab                	jmp    24b8 <phase_defused+0xee>
     250d:	e8 6e ed ff ff       	callq  1280 <__stack_chk_fail@plt>
