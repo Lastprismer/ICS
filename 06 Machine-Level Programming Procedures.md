@@ -1,4 +1,4 @@
-# Machine-Level Programming Procedures
+# Machine-Level Programming III Procedures
 
 **过程**是软件中一种很重要的抽象。它提供了一种封装代码的方式，用一组指定的参数和一个可选的返回值实现了某种功能。
 
@@ -98,7 +98,7 @@
   
   
   
-* **调用者保存寄存器**：`%rax, %rdi, %rsi, %rcx, %r8, %r9, %r10, %r11`
+* **调用者保存寄存器**：`%rax, %rcx, %rdi, %rsi, %r8, %r9, %r10, %r11`（`%rax, %rcx`和六个参数）
 
   * 过程P调用过程Q时，Q可以随便使用这些寄存器。因为P调用Q前，必须先保存这些数据，而在P返回后再将这些数据恢复。**保存它们是调用者的责任**。
 
@@ -106,7 +106,7 @@
 
 * `%rsp`：存储栈顶地址
 
-![](.\Images\Register Saving Conventions.png)
+<img src=".\Images\06-Register Saving Conventions.png" style="zoom: 50%;" />
 
 
 
@@ -114,4 +114,4 @@
 
 寄存器和栈的惯例使得 x86-64 的过程能够**递归地调用它们自身**。每个过程调用在栈中都有它自己的私有空间，因此多个未完成调用的局部变量不会相互影响。此外，栈的原则很自然地就提供了适当的策略，当过程被调用时分配局部存储，当返回时释放存储空间。
 
-![](.\Images\Recursive Function.png)
+<img src=".\Images\06-Recursive Function.png" style="zoom: 50%;" />

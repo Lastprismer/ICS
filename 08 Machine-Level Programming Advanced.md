@@ -1,4 +1,4 @@
-# Machine-Level Programming Advanced
+# Machine-Level Programming V Advanced
 
 
 
@@ -81,6 +81,7 @@ x86-64 Linux 系统的内存布局：
 * Text / Shared Libraries
   * 可执行的机器程序，只读
   * Text 一般从4M开始：`#define NULL 0`
+  * $2^{48}$ 以上的地址：保留系统内核中的代码和数据
 
 代码分析：内存占用、爆内存时的分析
 

@@ -1,4 +1,4 @@
-# Machine-Level Programming Data
+# Machine-Level Programming IV Data
 
 
 
@@ -230,7 +230,7 @@ struct s4
 
 ### 一、浮点寄存器和指令类型
 
-![](.\Images\FP Registers.png)
+<img src=".\Images\07-FP Registers.png" style="zoom:50%;" />
 
 以 AVX 为例，AVX 浮点体系结构允许数据存储在16个YMM寄存器中，名称为 `%ymm0 ~ %ymm15`，每个YMM寄存器都是32字节。
 
@@ -238,13 +238,11 @@ struct s4
 
 向量操作：**SIMD**（用`p`表示）：对整个寄存器（4个float，2个double）同时操作
 
-例：
+例：`vmovapd`：对齐的向量双精度传送
 
-* `vmovapd`：对齐的向量双精度传送
+<img src=".\Images\07-FP Mov.png" style="zoom:75%;" />
 
-  ![](.\Images\FP Mov.png)
-
-  传送指令中内存引用方式和整数MOV的指令一样
+传送指令中内存引用方式和整数MOV的指令一样
 
 * `addss`：标量单精度加法
 
