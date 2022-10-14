@@ -38,12 +38,12 @@ Representable Numbers: Limitations
 
   * **Sign bit**
 
-  * **Signifivand M**: normally a fractional value in range $[1.0, 2.0]$
+  * **Significand M**: normally a fractional value in range $[1.0, 2.0]$
 
   * **Exponent E**: weights value by power of two
 
 * Encoding
-  * <img src=".\Images\Float Encoding.png" style="zoom:33%;" />
+  * <img src=".\Images\03-Float Encoding.png" style="zoom:33%;" />
   * s 符号位
   * exp 阶码，e
   * frac 尾码，f
@@ -87,11 +87,11 @@ Representable Numbers: Limitations
    * **NaN (Not a Number)**：阶码全为1， 小数域不全为0
    * $\infty$ **无穷**：阶码全为1，小数域全为0.
 
-表格图片：<img src=".\Images\Float Representation.png" style="zoom:50%;" />
+表格图片：<img src=".\Images\03-Float Representation.png" style="zoom:50%;" />
 
 特殊补充：$0^-<0^+$，所以比较时需要 $\epsilon$
 
-浮点数：代表一段空间
+浮点数：代表数轴上一段长度
 
 
 

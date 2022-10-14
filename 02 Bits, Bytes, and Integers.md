@@ -19,7 +19,7 @@ Byte = 8 Bits
 * 十六进制表示法：在C中用0x开头
 * 内存：以Byte为单位的数组
 
-<img src=".\Images\Data Representations.png" style="zoom:50%;" align=left />
+<img src=".\Images\02-Data Representations.png" style="zoom:50%;"/>
 
 
 
@@ -97,7 +97,7 @@ Implicit casting also occurs via assignments and procedure calls
 
 * Overflow: 
 
-  <img src=".\Images\UAdd Overflow.png" style="zoom:50%;" /><img src=".\Images\TAdd Overflow.png" style="zoom:50%;" />
+  <img src=".\Images\02-UAdd Overflow.png" style="zoom:50%;" /><img src=".\Images\02-TAdd Overflow.png" style="zoom:50%;" />
 
 * Negation: same
 
@@ -150,7 +150,7 @@ Any given computer has a “Word Size”. Increasingly, machines have 64-bit wor
 
   * 小端存储：(Little Endian): x86, ARM processors running Android, iOS, and  Windows: Least significant byte has lowest address
 
-    <img src=".\Images\Byte Ordering.png" style="zoom:50%;" />
+    <img src=".\Images\02-Byte Ordering.png" style="zoom:50%;" />
 Representing Pointers: Different compilers & machines assign different locations to objects
 
 ### Representing Strings

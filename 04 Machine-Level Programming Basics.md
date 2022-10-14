@@ -30,7 +30,7 @@
 
 ### 汇编与机器代码
 
-<img src=".\Images\Programmer-Visible State.png" style="zoom:50%;" />
+<img src=".\Images\04-Programmer-Visible State.png" style="zoom:50%;" />
 
 通过机器代码可以看到的处理器状态：
 
@@ -63,7 +63,7 @@
 
   4，8，（10，不要用）的浮点，存储数据
 
-  <img src=".\Images\Assembly Data Types.png"  />
+  <img src=".\Images\04-Assembly Data Types.png"  />
 
   代码：用字节序列编码的一系列指令
   
@@ -103,9 +103,7 @@
 
 ### Registers 寄存器
 
-<img src=".\Images\Registers in x86.png" style="zoom:50%;" />
-
-（右边那些小字在“运行时栈”块，之后学到再说）
+<img src=".\Images\04-Registers in x86.png" style="zoom:50%;" />
 
 所有16个寄存器的低位部分都可以作为字节字（16位）、双字（32位）和四字（64位）数字来访问，不同的操作会访问不同的字节。
 
@@ -140,7 +138,7 @@
      $$
      Imm+R[r_b]+R[r_i]\cdot s
      $$
-     $Imm$：**立即数偏移**；$r_b$：**基址寄存器**；$r_i$：**变址寄存器**；$s$：比例因子（必须为1，2，4或8）
+     $Imm$：**立即数偏移**；$r_b$：**基址寄存器**；$r_i$：**变址寄存器**；$s$：比例因子**（必须为1，2，4或8）**
      
      此处寄存器中64位的内容被解释为一个内存地址
      
@@ -286,7 +284,7 @@ swap:
 
 ### 更多算数和逻辑指令
 
-![](.\Images\Arithmetic Expressions.png)
+![](.\Images\04-Arithmetic Expressions.png)
 
 * 有b, w, l, q四种，操作不同的大小
 
@@ -304,7 +302,7 @@ x86-64对128位（16字节）数的操作提供有限的支持，为 **八字**�
     </tr>
     <tr>
         <td>imulq S<br>mulq S</td>
-        <td>R[%rdx]:R[%rdx] &#8592 S * R[%rax] <br> R[%rdx]:R[%rax] &#8592 S * R[%rax]</td>
+        <td>R[%rdx]:R[%rax] &#8592 S * R[%rax] <br> R[%rdx]:R[%rax] &#8592 S * R[%rax]</td>
         <td>有符号全乘法 <br> 无符号全乘法</td>
     </tr>
     <tr>
@@ -318,11 +316,12 @@ x86-64对128位（16字节）数的操作提供有限的支持，为 **八字**�
         <td>有符号除法</td>
     </tr>
     <tr>
-        <td>idivq S</td>
+        <td>divq S</td>
         <td>R[%rdx] &#8592 R[%rdx]:R[%rax] mod S <br> R[%rdx] &#8592 R[%rdx]:R[%rax] / S</td>
         <td>无符号除法</td>
     </tr>
 </table>
+
 
 * imulq有两种：双操作数时，为从两个64位操作数中产生一个64位乘积；单操作数时（以及mulq，无符号乘法），一个参数必须在寄存器 %rax 中，而另一个作为指令的源操作数给出。乘积存放在寄存器%rdx（高64位）和%rax（低64位）中。
 * 其他同理
@@ -339,7 +338,7 @@ void store_uprod (uint128_t *dest, uint64_t x, uint64_t y)
 
 （注意大小端带来的区别）
 
-<img src=".\Images\Int128 Asm.png" style="zoom:50%;" />
+<img src=".\Images\04-Int128 Asm.png" style="zoom:50%;" />
 
 
 
@@ -359,4 +358,4 @@ void remdiv (long x, long y, long *qp, long *rp)
 }
 ```
 
-<img src=".\Images\64div Asm.png" style="zoom:50%;" />
+<img src=".\Images\04-64div Asm.png" style="zoom:50%;" />
