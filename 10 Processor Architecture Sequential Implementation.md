@@ -1,4 +1,8 @@
-# 10 Processor Architecture SEQ: Sequential Implementation
+# Processor Architecture II SEQ: Sequential Implementation
+
+
+
+[TOC]
 
 
 
@@ -18,7 +22,7 @@ Y86-64 的顺序实现
 * **执行**（execute）：
   1. 执行指令（ifun）指明的操作、计算内存引用的有效地址、增加或减少栈指针等，得到valE
   2. 设置条件码、检验条件码：条件转移或跳转
-* **访存**（）：将数据写入内存或从内存读出数据，值为valM
+* **访存**（memory）：将数据写入内存或从内存读出数据，值为valM
 * **写回**（write back）：最多写两个结果到寄存器文件
   * 这里有两个写口：`M`和`E`，一个是写`valM`的，一个是写`valE`的
   * 说明其他的`val`是**不能直接写**的
@@ -300,6 +304,7 @@ Y86-64 的顺序实现
 
 
 
+
 ## 二、SEQ硬件结构：
 
 SEQ：sequential，顺序的
@@ -403,13 +408,13 @@ SEQ实现中，组合逻辑的输入变化了，值就通过逻辑门网络传�
 * *icode、ifun逻辑控制块*：输出`icode`、`ifun`：如果接收到了`imem_error`信号，输出`nop`；
 
   ```
-  int icode = 
+  word icode = 
   {
   	imem_error: INOP;
   	1: imem_icode;
   }
   
-  int ifun = 
+  word ifun = 
   {
   	imem_error: FNONE;
   	1: imem_ifun;
@@ -447,21 +452,21 @@ SEQ实现中，组合逻辑的输入变化了，值就通过逻辑门网络传�
 * *信号*：根据执行阶段算出的`Cnd`，确定是否进行条件传送
 
 ```
-int srcA = 
+word srcA = 
 [
 	icode in { IRRMOVQ, IRMMOVQ, IOPQ, IPUSHQ } : rA;
 	icode in { IPOPQ, IRET } : RRSP;
 	1 : RNONE
 ]
 
-int srcB = 
+word srcB = 
 [
 	icode in { IOPQ, IRMMOVQ, IMRMOVQ } : rB
 	icode in { IPUSHQ, IPOPQ, ICALL, IRET } : RRSP
 	1 : RNONE
 ]
 
-int dstE = 
+word dstE = 
 [
 	icode in { IRRMOVQ } && Cnd : rB	# 条件传送
 	icode in { IIRMOVQ, IOPQ } : rB;
@@ -469,7 +474,7 @@ int dstE =
 	1 : RNONE
 ]
 
-int dstM = 
+word dstM = 
 [
 	icode in { IMRMOVQ, IPOPQ } : rA
 	1 : RNONE;
@@ -491,22 +496,22 @@ int dstM =
 * *Cond*：根据条件码和功能码，确定是否进行条件分支或者条件传送，产生的`Cnd`信号用于设置`dstE`，也用于下一个PC逻辑中
 
 ```
-int aluA = 
+word aluA = 
 [
 	icode in { IRRMOVQ, IOPQ } : valA;
-	icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ} : valC;
+	icode in { IIRMOVQ, IRMMOVQ, IMRMOVQ } : valC;
 	icode in { ICALL, IPUSHQ } : -8;
 	icode in { IRET, IPOPQ } : 8;
 ]
 # 其他情况不需要ALU
 
-int aluB = 
+word aluB = 
 [
 	icode in { IRMMOVQ, IMRMOVQ, IOPQ, ICALL, IPUSHQ, IRET, IPOPQ } : valB;
 	icode in { IRRMOVQ, IIRMOVQ } : 0
 ]
 
-int alufun = 
+word alufun = 
 [
 	icode == IOPQ : ifun:
 	1 : ALUADD;
@@ -532,19 +537,19 @@ bool set_cc = icode in { IOPQ };
 bool mem_read = icode in { IMRMOVQ, IPOPQ, IRET };
 bool mem_write = icode in {	IRMMOVQ, IPUSHQ, ICALL };
 
-int mem_addr = 
+word mem_addr = 
 [
 	icode in { IRMMOVQ, IPOSHQ, ICALL, IMRMOVQ } : valE;
 	icode in { IPOPQ, IRET } : valA;
 ]
 
-int mem_data = 
+word mem_data = 
 [
 	icode in { IRMMOVQ, IPUSHQ } : valA;
 	icode == ICALL : valP;
 ]
 
-int Stat = 
+word Stat = 
 [
 	imem_error || dmem_error : SADR; # 地址异常
 	icode == IHALT : SHLT; # halt状态
@@ -562,7 +567,7 @@ int Stat =
 <img src="./Images/10-Update PC Logic.png" style="zoom:67%;" />
 
 ```
-int new_pc = 
+word new_pc = 
 [
 	icode == ICALL : valC;
 	icode == IJXX && Cnd : valC;

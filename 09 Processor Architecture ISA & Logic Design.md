@@ -1,4 +1,4 @@
-# 09 Processor Architecture I: ISA & Logic Design
+# Processor Architecture I: ISA & Logic Design
 
 
 
