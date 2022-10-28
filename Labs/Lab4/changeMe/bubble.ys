@@ -1,0 +1,72 @@
+# 名字 学号
+# Execution begins at address 0
+    .pos 0
+    irmovq stack, %rsp          # 设置栈指针
+    call main
+    halt
+
+
+# 示例数组
+.align 8
+Array:
+    .quad 0xbca
+    .quad 0xcba
+    .quad 0xacb
+    .quad 0xcab
+    .quad 0xabc
+    .quad 0xbac
+
+# main函数
+main:
+    irmovq Array, %rdi
+	irmovq $6, %rsi
+    call bubble_sort
+    ret
+
+
+# *data in %rdi, count in %rsi
+bubble_sort:
+	irmovq		$0, %r11		# tmp3 = 0
+    irmovq		$8, %r10		# tmp2 = 8
+	irmovq		$1, %r9			# tmp1 = 1
+	addq		%rsi, %rsi
+	addq		%rsi, %rsi
+	addq		%rsi, %rsi		# %rsi *= 8
+	addq		%rdi, %rsi
+
+	subq		%r10, %rsi		# %rsi = -8(%rdi, %rsi, 8), last
+	jmp			outer_judge
+
+inner_loop:
+	addq		%r10, %rax		# i++
+
+inner_judge:
+	rrmovq		%rsi, %r12		# tmp4 = last
+	subq		%rax, %r12		# if (last <= i)
+	jle			outer_update			# break
+	mrmovq		8(%rax), %rdx	# *(i + 1)
+	mrmovq		(%rax), %rcx	# *i
+	rrmovq		%rcx, %r12		# tmp4 = *i
+	subq		%rdx, %r12		# if (*i - *(i + 1) <= 0)
+	jle	inner_loop				# no if
+	rmmovq		%rcx, 8(%rax)	
+	rmmovq		%rdx, (%rax)
+	jmp	inner_loop
+
+outer_update:
+	subq		%r10, %rsi		# last--
+
+outer_judge:
+	rrmovq		%rsi, %r12		# tmp4 = last
+	subq		%rdi, %r12		# if (tmp4 <= data)
+	jle			return			#     return;
+	rrmovq		%rdi, %rax		# i = data
+	jmp	inner_judge
+
+return:
+	ret
+
+
+# 栈从这里开始，向上生长
+    .pos 0x400
+stack:

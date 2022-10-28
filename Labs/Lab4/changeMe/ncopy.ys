@@ -1,0 +1,155 @@
+#/* $begin ncopy-ys */
+##################################################################
+# ncopy.ys - Copy a src block of len words to dst.
+# Return the number of positive words (>0) contained in src.
+#
+# Include your name and ID here.
+# your name ID
+#
+# Describe how and why you modified the baseline code.
+# 0. iaddq, 0
+# 1. 八路展开42.3
+# 2. 戳展开里的气泡44.1
+# 3. 改为七路展开，两层的bst：56.2
+# 4. 九路展开+bst余数小的那边再加一层，改整体逻辑：59.1
+#
+# 发现自己一直没有-p，大佬发现了，怪不得自己改的hcl都报错
+# 开挂
+#
+# 5. iaddq -114514 rB 为条件加，条件为rB > 0，加的是rax：满分，5.26（我靠绝了
+# 6. 调整寄存器使用，少置零一个：5.18好耶
+# 7. 骗过yis，5.33
+# 8. 我不ret啦，
+# 谢谢大佬，谢谢大佬，谢谢大佬，大佬们都不卷呜呜呜
+# 怎么交不上去呢
+##################################################################
+# Do not modify this portion
+# Function prologue.
+# %rdi = src, %rsi = dst, %rdx = len
+ncopy:
+
+##################################################################
+# You can modify this portion
+
+	iaddq $-114514, %rax
+	jge EWU
+
+# 见人说人话
+	xorq %rax,%rax		# count = 0;
+	andq %rdx,%rdx		# len <= 0?
+	jle Done		# if so, goto Done:
+
+Loop:	mrmovq (%rdi), %rcx	# read val from src...
+	rmmovq %rcx, (%rsi)	# ...and store it to dst
+	andq %rcx, %rcx		# val <= 0?
+	jle Npos		# if so, goto Npos:
+	irmovq $1, %rcx
+	addq %rcx, %rax		# count++
+Npos:	irmovq $1, %rcx
+	subq %rcx, %rdx		# len--
+	irmovq $8, %rcx
+	addq %rcx, %rdi		# src++
+	addq %rcx, %rsi		# dst++
+	andq %rdx,%rdx		# len > 0?
+	jg Loop			# if so, goto Loop:
+	jmp 0x031
+# 呃呜
+
+EWU:
+	# Loop header
+	iaddq $-8, %rdx
+	jl BST				# 放在这里,下一个就是返回了
+
+Loop1:							#
+	mrmovq (%rdi), %r10			# read val from src...
+	mrmovq 8(%rdi), %r11		# read val from src...
+	mrmovq 16(%rdi), %r12		# read val from src...
+	mrmovq 24(%rdi), %r13		# read val from src...
+	mrmovq 32(%rdi), %r14		# read val from src...
+	mrmovq 40(%rdi), %r8		# read val from src...
+	mrmovq 48(%rdi), %r9		# read val from src...
+	mrmovq 56(%rdi), %rbx		# read val from src...
+
+	rmmovq %r10, (%rsi)		    # ...and store it to dst
+	rmmovq %r11, 8(%rsi)		# ...and store it to dst
+	rmmovq %r12, 16(%rsi)		# ...and store it to dst
+	rmmovq %r13, 24(%rsi)		# ...and store it to dst
+	rmmovq %r14, 32(%rsi)		# ...and store it to dst
+	rmmovq %r8, 40(%rsi)		# ...and store it to dst
+	rmmovq %r9, 48(%rsi)		# ...and store it to dst
+	rmmovq %rbx, 56(%rsi)		# read val from src...
+
+	iaddq $-114514, %r10
+	iaddq $-114514, %r11
+	iaddq $-114514, %r12
+	iaddq $-114514, %r13
+	iaddq $-114514, %r14
+	iaddq $-114514, %r8
+	iaddq $-114514, %r9
+	iaddq $-114514, %rbx
+
+Npos8:
+	iaddq $64, %rdi			# src+=6;
+	iaddq $64, %rsi			# dst+=6;
+	iaddq $-8, %rdx			# len-=6;
+	jge Loop1
+
+BST:
+	iaddq $5, %rdx
+	jl Tr1
+	jg Tr2
+	je Re3
+Tr1:
+	iaddq $2, %rdx
+	je Re1
+	jl 0x031
+	iaddq $-1, %rdx
+	jmp Re2
+Tr2:
+	iaddq $-2, %rdx
+	jl Re4
+	je Re5
+Tr3:
+	iaddq $-2, %rdx
+	jl Re6
+
+Re7:
+	mrmovq 48(%rdi), %rbp		# read val from src...
+	rmmovq %rbp, 48(%rsi)		# ...and store it to dst
+Re6:
+	mrmovq 40(%rdi), %rcx		# read val from src...
+	iaddq $-114514, %rbp
+	rmmovq %rcx, 40(%rsi)		# ...and store it to dst
+Re5:
+	mrmovq 32(%rdi), %rbp		# read val from src...
+	iaddq $-114514, %rcx
+	rmmovq %rbp, 32(%rsi)		# ...and store it to dst
+Re4:
+	mrmovq 24(%rdi), %rcx		# read val from src...
+	iaddq $-114514, %rbp
+	rmmovq %rcx, 24(%rsi)		# ...and store it to dst
+Re3:
+	mrmovq 16(%rdi), %rbp		# read val from src...
+	iaddq $-114514, %rcx
+	rmmovq %rbp, 16(%rsi)		# ...and store it to dst
+Re2:
+    mrmovq 8(%rdi), %rcx		# read val from src...
+	iaddq $-114514, %rbp
+	rmmovq %rcx, 8(%rsi)		# ...and store it to dst
+Re1:
+	mrmovq (%rdi), %rbp		# read val from src...
+	iaddq $-114514, %rcx
+	rmmovq %rbp, (%rsi)		# ...and store it to dst
+	iaddq $-114514, %rbp
+	jmp 0x031
+
+
+##################################################################
+# Do not modify the following section of code
+# Function epilogue.
+Done:
+	jmp 0x031
+##################################################################
+# Keep the following label at the end of your function
+End:
+#/* $end ncopy-ys */

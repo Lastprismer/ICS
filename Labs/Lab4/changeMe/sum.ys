@@ -1,0 +1,46 @@
+# nil nullptr
+# Execution begins at address 0
+    .pos 0
+    irmovq stack, %rsp          # 设置栈指针
+    call main
+    halt
+
+
+# 示例链表
+    .align 8
+ele1:
+    .quad 0x00a
+    .quad ele2
+ele2:
+    .quad 0x0b0
+    .quad ele3
+ele3:
+    .quad 0xc00
+    .quad 0
+
+
+# main函数
+main:
+    irmovq ele1, %rdi
+    call sum_list
+    ret
+
+
+# ls in %rdi, return sum in %rax
+sum_list:
+    irmovq $0, %rsi             # int i = 0;
+    irmovq $0, %rax             # int ans = 0;
+loop:                           # while (1)
+    subq %rsi, %rdi             #   if (ls->next - i = 0)
+    je return                   #       return ans;
+	mrmovq (%rdi), %rbx         #   k = ls->val;
+    addq %rbx, %rax             #   ans += k;
+	mrmovq 8(%rdi), %rdi        #   ls = ls->next
+    jmp loop
+return:
+    ret
+
+
+# 栈从这里开始，向上生长
+    .pos 0x200
+stack:

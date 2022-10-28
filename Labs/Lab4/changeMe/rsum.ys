@@ -1,0 +1,49 @@
+# cTHUlhu stackoverflow
+# Execution begins at address 0
+    .pos 0
+    irmovq stack, %rsp          # 设置栈指针
+    call main
+    halt
+
+
+# 示例链表
+    .align 8
+ele1:
+    .quad 0x00a
+    .quad ele2
+ele2:
+    .quad 0x0b0
+    .quad ele3
+ele3:
+    .quad 0xc00
+    .quad 0
+
+
+# main函数
+main:
+    irmovq ele1, %rdi
+    call rsum_list
+    ret
+
+
+# ls in %rdi, return sum in %rax
+rsum_list:
+    irmovq $0, %rsi             #   int i = 0;
+    irmovq $0, %rax             #   int ans = 0;
+    subq %rsi, %rdi             #   if (ls->next - i = 0)
+    jne continue                #       goto continue
+    ret                         #   return ans;
+
+continue:
+	mrmovq (%rdi), %rcx         #   k = ls->val;
+    pushq %rcx                  #   存入 k
+	mrmovq 8(%rdi), %rdi        #
+    call rsum_list              #   ans = rsum_list(ls->next)
+    popq %rcx                   #   读取 k
+    addq %rcx, %rax             #   ans += k
+    ret
+
+
+# 栈从这里开始，向上生长
+    .pos 0x200
+stack:
