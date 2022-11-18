@@ -57,7 +57,7 @@ Shell：交互型的应用级程序，执行一系列的 **读/求值** 步骤�
 
 1. **进程组**
    * 子进程和它的父进程同属于一个进程组，进程组ID为正整数，`getpgrp`获取
-   * `setpgid(pid_t pid, pid_t pgid)`将进程`pid`的进程组改为`pgid`，`pid = 0`时改变当前进程，`pgid = 0`时用`pid`指定的进程ID作为进程组ID
+   * `setgpid(pid_t pid, pid_t pgid)`将进程`pid`的进程组改为`gpid`，`pid = 0`时改变当前进程，`gpid = 0`时用`pid`指定的进程ID作为进程组ID
 
 2. `/bin/kill`程序发送信号
 
