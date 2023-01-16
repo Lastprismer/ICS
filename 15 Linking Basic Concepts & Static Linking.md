@@ -1,5 +1,7 @@
 # Linking Basic Concepts & Static Linking
 
+
+
 [TOC]
 
 
@@ -177,7 +179,7 @@ ELF可重定位目标文件的格式：
 
 防止类型错误匹配的规则：
 
-* 能不用全局变量，就不用那个
+* 能不用全局变量就不用
 * 多用`static`
 * 在一个头文件中把所有不是`static`的东西都声明了
 * 在头文件的声明中全写上`extern`
@@ -276,7 +278,7 @@ int sum(int *a, int n) {
 ```
 
 * `main`引用了`array`和`sum`，汇编器产生两个重定位条目
-* `array`用决定引用，`sum`用相对引用
+* `array`用绝对引用，`sum`用相对引用
 
 
 
@@ -298,7 +300,7 @@ ADDR(r.symbol) = ADDR(sum) = 0x4004e8：sum的运行时地址
 
 计算：
 
-1. `refaddr = ADDR(s) + r.offset = 0x4004df`，得到要引用的实际地址
+1. `refaddr = ADDR(s) + r.offset = 0x4004df`，得到引用位置的实际地址
 2. `*refptr = (unsigned) (ADDR(r.symbol) + r.addend - refaddr) = 0x5`，得到PC相对地址
 
 * 可看出此处的`r.addend`为：*引用地址在代码中的位置，和下一条代码之间的差*——`call`后面的`add`为`0x13`，它之前的第四个字节存着的就是引用地址

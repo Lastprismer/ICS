@@ -1,4 +1,4 @@
-# 25 Concurrent Programming
+# Concurrent Programming
 
 
 

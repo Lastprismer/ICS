@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "shr.h": "c",
-        "unistd.h": "c",
-        "stdio.h": "c"
-    }
-}
